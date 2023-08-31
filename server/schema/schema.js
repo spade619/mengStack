@@ -76,7 +76,8 @@ const Brands = require('../models/Brand')
          GraphQLString, 
          GraphQLInt, 
          GraphQLSchema,
-         GraphQLList} = require('graphql')
+         GraphQLList,
+         GraphQLNonNull} = require('graphql')
 
          //product items type
   const ProductType = new GraphQLObjectType({
@@ -145,6 +146,41 @@ const Brands = require('../models/Brand')
     }
  })
 
+
+
+ //-----------MUTATIONS------------------------
+ const mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        //to add item
+        addProduct: {
+            type: ProductType,
+            args: {
+                productName: {type: GraphQLNonNull(GraphQLString)}, 
+                quantity: {type: GraphQLNonNull(GraphQLInt)},  
+            },
+            resolve(parent, args) {
+                const item = new Items({
+                    productName: args.productName,
+                    quantity: args.quantity 
+                })
+                return item.save()
+            }
+        },
+        // to delete item
+        deleteProduct: {
+            type: ProductType,
+            args: {
+               id: {type: GraphQLNonNull(GraphQLID)}
+            },
+            resolve(parent, args) {
+               
+                return Items.findByIdAndRemove
+            }
+        },
+    }
+ })
  module.exports = new GraphQLSchema ({
-    query: RootQuery
+    query: RootQuery,
+    mutation
  })
